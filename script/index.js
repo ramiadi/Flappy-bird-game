@@ -1,20 +1,15 @@
-// Create a new board
-let board;
-let boardHeight = 500;
-let boardWidth = 500;
-let context;
+const canvas = document.getElementById("flappy-el");
+const ctx = canvas.getContext("2d");
 
-class Flappy {
-  constructor() {
-    this.x = 50;
-    this.y = 50;
-    this.width = this.width / this.x;
-    this.height = this.height / this.y;
-  }
+const playerImage = new Image();
+playerImage.src = "./flappybird.png";
+let x = 0;
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(50, 50, 100, 100);
+
+  requestAnimationFrame(animate);
 }
 
-window.onload = () => {
-  board = document.getElementById("flappy-el");
-
-  context = board.getContext("2d");
-};
+animate();
