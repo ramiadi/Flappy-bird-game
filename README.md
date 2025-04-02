@@ -4,5 +4,5 @@ The JavaScript file name i used is: oopIndex.js
 
 How to play?
 
-- Press the keybar, space or x 
+- Press the spacebar, enter or x 
 
