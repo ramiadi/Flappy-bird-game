@@ -5,6 +5,7 @@ let context;
 
 let gameOver = false;
 let score = 0;
+let passedPipes = 0; // Counter for passed pipes
 
 class Bird {
   constructor(
@@ -53,10 +54,56 @@ class Bird {
       this.velocityY = -6; // Adjusted jump velocity for smoother movement
     }
   }
-  // add a method to check if the bird is colliding with the ground
+
+  resetPosition() {
+    this.birdX = 20; // Initial X position of the bird
+    this.birdY = 300; // Initial Y position of the bird
+
+    // Reset bird's velocity
+    this.velocityY = 0;
+
+    // Reset game state
+    score = 0; // Reset score
+    passedPipes = 0; // Reset passed pipes counter
+    pipes = []; // Clear pipes array
+    gameOver = false; // Reset game over state
+  }
+
+  resetGame() {
+    this.resetPosition(); // Reset bird's position and game state
+    pipes = []; // Clear all pipes
+    context.clearRect(0, 0, boardwidth, boardheight); // Clear the canvas
+
+    // Redraw the bird
+    this.draw();
+
+    // Restart the game loop
+    gameOver = false;
+    requestAnimationFrame(update);
+  }
+
   checkCollisionGround() {
     if (this.birdY + this.birdHeight >= boardheight) {
       gameOver = true; // End the game if the bird hits the ground
+    }
+  }
+
+  detectCollision(pipe) {
+    return (
+      this.birdX < pipe.pipeX + pipe.pipeWidth &&
+      this.birdX + this.birdWidth > pipe.pipeX &&
+      this.birdY < pipe.pipeY + pipe.pipeHeight &&
+      this.birdY + this.birdHeight > pipe.pipeY
+    );
+  }
+
+  checkCollisionPipes(pipes) {
+    for (let pipe of pipes) {
+      if (this.detectCollision(pipe)) {
+        gameOver = true; // Bird hit a pipe
+        this.resetGame(); // Reset the game
+        break;
+      }
     }
   }
 }
@@ -101,10 +148,18 @@ window.onload = function () {
   bottomPipeImg = new Image();
   bottomPipeImg.src = "/bottompipe.png";
 
+  // Use setInterval to spawn pipes at regular intervals
   setInterval(placePipes, 1500);
 
   document.addEventListener("keydown", (e) => {
-    bird.jump(e);
+    if (gameOver) {
+      // Restart the game if gameOver is true and one of the keys is pressed
+      if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyX") {
+        bird.resetGame();
+      }
+    } else {
+      bird.jump(e); // Allow jumping during gameplay
+    }
   });
 };
 
@@ -128,12 +183,22 @@ function update() {
   // Draw the bird
   bird.draw();
 
+  // Check for collision with pipes
+  bird.checkCollisionPipes(pipes);
+
   // Draw and update pipes
   for (let i = 0; i < pipes.length; i++) {
     pipes[i].update(-2); // Move the pipe left
     pipes[i].draw(); // Draw the pipe
 
-    if (detectCollision(bird, pipes[i])) {
+    // check if the bird has passed the pipe
+    if (!pipes[i].passed && bird.birdX > pipes[i].pipeX + pipes[i].pipeWidth) {
+      passedPipes++; // Increment the passed pipes counter
+      pipes[i].passed = true; // Mark the pipe as passed
+      score += 0.5; // Increment score for passing a pipe
+    }
+
+    if (bird.detectCollision(pipes[i])) {
       gameOver = true; // Bird hit a pipe
       return; // Stop further updates if the game is over
     }
@@ -143,6 +208,11 @@ function update() {
   while (pipes.length > 0 && pipes[0].pipeX < -pipes[0].pipeWidth) {
     pipes.shift();
   }
+
+  // Draw the score
+  context.fillStyle = "white";
+  context.font = "45px sans-serif";
+  context.fillText("Score: " + score, 10, 50);
 }
 
 function placePipes() {
@@ -160,13 +230,4 @@ function placePipes() {
   );
 
   pipes.push(topPipe, bottomPipe); // Add pipes to the array
-}
-
-function detectCollision(bird, pipe) {
-  return (
-    bird.birdX < pipe.pipeX + pipe.pipeWidth &&
-    bird.birdX + bird.birdWidth > bird.birdX &&
-    bird.birdY < pipe.pipeY + pipe.pipeHeight &&
-    bird.birdY + bird.birdHeight > bird.birdY
-  );
 }
