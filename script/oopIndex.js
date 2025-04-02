@@ -1,11 +1,12 @@
 let board;
-let boardwidth = 480;
+let boardwidth = 550;
 let boardheight = 640;
 let context;
 
 let gameOver = false;
 let score = 0;
 let passedPipes = 0; // Counter for passed pipes
+let gameStarted = false; // Flag to track if the game has started
 
 class Bird {
   constructor(
@@ -139,7 +140,14 @@ window.onload = function () {
   context = board.getContext("2d");
 
   bird.loadImage(() => {
-    requestAnimationFrame(update); // Start the game loop after the image is loaded
+    // Wait for the user to start the game
+    context.fillStyle = "white";
+    context.font = "30px sans-serif";
+    context.fillText(
+      "Press X, Space, or ArrowUp to Start",
+      30,
+      boardheight / 2
+    );
   });
 
   topPipeImg = new Image();
@@ -148,11 +156,20 @@ window.onload = function () {
   bottomPipeImg = new Image();
   bottomPipeImg.src = "/bottompipe.png";
 
-  // Use setInterval to spawn pipes at regular intervals
-  setInterval(placePipes, 1500);
+  setInterval(() => {
+    if (gameStarted) {
+      placePipes(); // Spawn pipes only if the game has started
+    }
+  }, 1500);
 
   document.addEventListener("keydown", (e) => {
-    if (gameOver) {
+    if (!gameStarted) {
+      // Start the game when one of the keys is pressed
+      if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyX") {
+        gameStarted = true;
+        requestAnimationFrame(update); // Start the game loop
+      }
+    } else if (gameOver) {
       // Restart the game if gameOver is true and one of the keys is pressed
       if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyX") {
         bird.resetGame();
