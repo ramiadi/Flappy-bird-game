@@ -150,12 +150,18 @@ window.onload = function () {
     );
   });
 
-  // Ensure the paths to the images are correct
+  // Debugging: Ensure the image paths are correct
   topPipeImg = new Image();
-  topPipeImg.src = "./assets/toppipe.png"; // Adjusted path to match the hosted structure
+  topPipeImg.src = "./assets/toppipe.png"; // Adjusted path
+  topPipeImg.onload = () => console.log("Top pipe image loaded successfully.");
+  topPipeImg.onerror = () => console.error("Failed to load top pipe image.");
 
   bottomPipeImg = new Image();
-  bottomPipeImg.src = "./assets/bottompipe.png"; // Adjusted path to match the hosted structure
+  bottomPipeImg.src = "./assets/bottompipe.png"; // Adjusted path
+  bottomPipeImg.onload = () =>
+    console.log("Bottom pipe image loaded successfully.");
+  bottomPipeImg.onerror = () =>
+    console.error("Failed to load bottom pipe image.");
 
   setInterval(() => {
     if (gameStarted) {
@@ -236,6 +242,9 @@ function update() {
 function placePipes() {
   let randomPipeY = -Math.random() * 350; // Random Y position for the top pipe
   let openingSpace = 150; // Space between top and bottom pipes
+
+  // Debugging: Log pipe placement
+  console.log("Placing pipes at Y:", randomPipeY);
 
   // Create instances of the Pipe class with the correct images
   let topPipe = new Pipe(boardwidth, randomPipeY, 64, 512, topPipeImg);
