@@ -150,11 +150,12 @@ window.onload = function () {
     );
   });
 
+  // Ensure the paths to the images are correct
   topPipeImg = new Image();
-  topPipeImg.src = "/toppipe.png";
+  topPipeImg.src = "./assets/toppipe.png"; // Adjusted path to match the hosted structure
 
   bottomPipeImg = new Image();
-  bottomPipeImg.src = "/bottompipe.png";
+  bottomPipeImg.src = "./assets/bottompipe.png"; // Adjusted path to match the hosted structure
 
   setInterval(() => {
     if (gameStarted) {
